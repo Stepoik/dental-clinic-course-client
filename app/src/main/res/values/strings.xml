@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">DentalClinic</string>
+    <string name="appointment">Записаться к врачу</string>
+    <string name="patient">Пациент</string>
+    <string name="procedures">Процедуры</string>
+    <string name="show_all">Показать все</string>
+    <string name="best_doctors">Лучшие доктора</string>
+    <plurals name="doctor">
+        <item quantity="one">%d доктор</item>
+        <item quantity="few">%d доктора</item>
+        <item quantity="other">%d докторов</item>
+    </plurals>
+    <plurals name="year">
+        <item quantity="one">%d год</item>
+        <item quantity="few">%d года</item>
+        <item quantity="many">%d лет</item>
+        <item quantity="other">%d лет</item>
+    </plurals>
+</resources>
