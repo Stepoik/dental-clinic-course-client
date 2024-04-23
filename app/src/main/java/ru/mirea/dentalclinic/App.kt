@@ -5,5 +5,5 @@ import ru.mirea.dentalclinic.di.AppComponent
 import ru.mirea.dentalclinic.di.DaggerAppComponent
 
 class App : Application() {
-    val appScope: AppComponent = DaggerAppComponent.factory().create(this)
+    val appComponent: AppComponent = DaggerAppComponent.factory().create(this)
 }

@@ -19,7 +19,7 @@ inline fun <reified VM : ViewModel> daggerViewModel(crossinline body: () -> VM):
 }
 
 @Composable
-fun appScope(): AppComponent {
+fun appComponent(): AppComponent {
     val application: App = LocalContext.current.applicationContext as App
-    return application.appScope
+    return application.appComponent
 }
