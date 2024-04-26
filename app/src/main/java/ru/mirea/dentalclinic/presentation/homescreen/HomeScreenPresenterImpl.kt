@@ -24,8 +24,8 @@ class HomeScreenPresenterImpl(
         navController.navigateToDoctorPage(doctorId)
     }
 
-    override fun navigateToAppointment() {
-        navController.navigateToAppointmentScreen()
+    override fun navigateToAppointment(doctorId: Long) {
+        navController.navigateToAppointmentScreen(doctorId)
     }
 
 }

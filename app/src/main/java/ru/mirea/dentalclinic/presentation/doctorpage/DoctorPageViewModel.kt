@@ -19,15 +19,17 @@ import ru.mirea.dentalclinic.presentation.doctorpage.formatters.ProcedureFormatt
 import ru.mirea.dentalclinic.presentation.doctorpage.models.ProcedureVO
 
 class DoctorPageViewModel @AssistedInject constructor(
-    @Assisted private val doctorId: Long,
+    @Assisted val doctorId: Long,
     private val getDoctorByIdUseCase: GetDoctorByIdUseCase,
     private val doctorFormatter: DoctorFormatter,
     private val procedureFormatter: ProcedureFormatter
 ) : ViewModel() {
     private val _state = MutableStateFlow<DoctorPageState>(DoctorPageState.Idle)
-    val state: StateFlow<DoctorPageState> = _state.onSubscription {
+    val state: StateFlow<DoctorPageState> = _state
+
+    init {
         update()
-    }.stateIn(viewModelScope, SharingStarted.Lazily, DoctorPageState.Idle)
+    }
 
     fun update() {
         if (state.value is DoctorPageState.Loading) {

@@ -6,4 +6,6 @@ interface DoctorPagePresenter {
     val state: StateFlow<DoctorPageState>
 
     fun update()
+
+    fun navigateToAppointment()
 }

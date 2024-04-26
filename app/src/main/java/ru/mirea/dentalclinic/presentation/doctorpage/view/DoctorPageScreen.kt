@@ -1,5 +1,6 @@
 package ru.mirea.dentalclinic.presentation.doctorpage.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.mirea.dentalclinic.R
+import ru.mirea.dentalclinic.presentation.appointment.AppointmentPresenter
 import ru.mirea.dentalclinic.presentation.common.view.Loading
 import ru.mirea.dentalclinic.presentation.doctorpage.DoctorPagePresenter
 import ru.mirea.dentalclinic.presentation.doctorpage.DoctorPageState
@@ -28,7 +30,7 @@ fun DoctorPageScreen(presenter: DoctorPagePresenter) {
         ) {
             when (state) {
                 is DoctorPageState.Success -> {
-                    DoctorInformation(state, modifier = Modifier.fillMaxSize())
+                    DoctorInformation(state = state, presenter = presenter, modifier = Modifier.fillMaxSize())
                 }
 
                 is DoctorPageState.Loading -> {
@@ -57,9 +59,10 @@ fun ErrorMessage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DoctorInformation(state: DoctorPageState.Success, modifier: Modifier = Modifier) {
+fun DoctorInformation(state: DoctorPageState.Success, presenter: DoctorPagePresenter, modifier: Modifier = Modifier) {
     Text(text = state.doctor.name)
     for (i in state.procedures) {
         Text(text = i.name)
     }
+    Text(text = stringResource(id = R.string.appointment), Modifier.clickable(onClick = presenter::navigateToAppointment))
 }

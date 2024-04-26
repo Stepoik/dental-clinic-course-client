@@ -80,7 +80,7 @@ fun HomeScreen(presenter: HomeScreenPresenter) {
                     .background(MaterialTheme.colorScheme.primary)
                     .verticalScroll(scrollState)
             ) {
-                PatientInfo(state = state, presenter = presenter)
+                PatientInfo(state = state)
                 ProceduresInfo(modifier = Modifier.padding(top = 40.dp), homeScreenState = state)
                 BestDoctorsInfo(
                     presenter = presenter,
@@ -94,7 +94,7 @@ fun HomeScreen(presenter: HomeScreenPresenter) {
 
 // TODO: В будущем убрать навигацию отсюда
 @Composable
-fun PatientInfo(modifier: Modifier = Modifier, state: HomeScreenState, presenter: HomeScreenPresenter) {
+fun PatientInfo(modifier: Modifier = Modifier, state: HomeScreenState) {
     val patientName = state.patient?.patientName ?: ""
     Row(modifier = modifier.padding(25.dp), verticalAlignment = Alignment.CenterVertically) {
         Image(
@@ -102,7 +102,6 @@ fun PatientInfo(modifier: Modifier = Modifier, state: HomeScreenState, presenter
             modifier = Modifier
                 .weight(1f)
                 .size(60.dp)
-                .clickable { presenter.navigateToAppointment() }
         )
         Column(modifier = Modifier.weight(5f)) {
             Text(
@@ -236,7 +235,7 @@ fun defaultPresenter(state: HomeScreenState) = object : HomeScreenPresenter {
     override fun update() {}
     override fun navigateToDoctorList() {}
     override fun navigateToDoctorPage(doctorId: Long) {}
-    override fun navigateToAppointment() {}
+    override fun navigateToAppointment(doctorId: Long) {}
 }
 
 @Composable
@@ -263,7 +262,7 @@ fun BestDoctorsInfoPreview() {
 @Preview
 fun PatientInfoPreview() {
     val state = HomeScreenState()
-    PatientInfo(Modifier.fillMaxWidth(), state, defaultPresenter(HomeScreenState()))
+    PatientInfo(Modifier.fillMaxWidth(), state)
 }
 
 @Composable

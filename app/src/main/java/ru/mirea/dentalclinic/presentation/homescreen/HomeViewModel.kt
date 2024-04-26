@@ -29,14 +29,13 @@ class HomeViewModel @Inject constructor(
     private val procedureFormatter: ProcedureFormatter
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeScreenState())
-    private var isFirstSubscribe = true
+
     val state: StateFlow<HomeScreenState>
-        get() = _state.onStart {
-            if (isFirstSubscribe) {
-                update()
-                isFirstSubscribe = !isFirstSubscribe
-            }
-        }.stateIn(viewModelScope, SharingStarted.Lazily, HomeScreenState())
+        get() = _state
+
+    init {
+        update()
+    }
 
     fun update() {
         if (state.value.isLoading) {

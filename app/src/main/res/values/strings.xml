@@ -5,6 +5,7 @@
     <string name="procedures">Процедуры</string>
     <string name="show_all">Показать все</string>
     <string name="best_doctors">Лучшие доктора</string>
+    <string name="appointments">Записи</string>
     <string name="network_error">Ошибка при загрузке((</string>
     <plurals name="doctor">
         <item quantity="one">%d доктор</item>

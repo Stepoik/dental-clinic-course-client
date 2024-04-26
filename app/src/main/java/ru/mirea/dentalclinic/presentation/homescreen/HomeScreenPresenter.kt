@@ -10,5 +10,5 @@ interface HomeScreenPresenter {
 
     fun navigateToDoctorPage(doctorId: Long)
 
-    fun navigateToAppointment()
+    fun navigateToAppointment(doctorId: Long)
 }

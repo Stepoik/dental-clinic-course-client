@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                         homeScreen(navController)
                         doctorList(navController)
                         doctorPage(navController)
-                        appointmentScreen()
+                        appointmentScreen(navController)
                     }
                 }
             }

@@ -13,7 +13,7 @@ import ru.mirea.dentalclinic.utils.ComponentViewModel
 import ru.mirea.dentalclinic.utils.appComponent
 import ru.mirea.dentalclinic.utils.daggerViewModel
 
-const val DOCTOR_ID = "doctorId"
+private const val DOCTOR_ID = "doctorId"
 
 const val DOCTOR_PAGE_ROUTE = "doctor_page/{$DOCTOR_ID}"
 private const val DOCTOR_PAGE_PATTERN = "doctor_page/%d"
@@ -34,7 +34,7 @@ fun NavGraphBuilder.doctorPage(navController: NavController) {
             val viewModelFactory = componentViewModel.component.doctorPageViewModelFactory()
             viewModelFactory.create(id)
         }
-        val presenter = DoctorPagePresenterImpl(viewModel)
+        val presenter = DoctorPagePresenterImpl(viewModel, navController)
         DoctorPageScreen(presenter = presenter)
     }
 }
