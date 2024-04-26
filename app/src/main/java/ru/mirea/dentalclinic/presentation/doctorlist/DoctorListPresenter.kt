@@ -9,4 +9,6 @@ interface DoctorListPresenter {
     fun onQueryChanged(query: String)
 
     fun nextPage()
+
+    fun navigateToDoctorPage(doctorId: Long)
 }

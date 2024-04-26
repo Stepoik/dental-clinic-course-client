@@ -2,6 +2,7 @@ package ru.mirea.dentalclinic.presentation.homescreen
 
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.StateFlow
+import ru.mirea.dentalclinic.presentation.appointment.view.navigateToAppointmentScreen
 import ru.mirea.dentalclinic.presentation.doctorlist.view.navigateToDoctorList
 import ru.mirea.dentalclinic.presentation.doctorpage.view.navigateToDoctorPage
 
@@ -22,4 +23,9 @@ class HomeScreenPresenterImpl(
     override fun navigateToDoctorPage(doctorId: Long) {
         navController.navigateToDoctorPage(doctorId)
     }
+
+    override fun navigateToAppointment() {
+        navController.navigateToAppointmentScreen()
+    }
+
 }

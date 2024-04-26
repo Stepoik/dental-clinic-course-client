@@ -11,7 +11,7 @@ import ru.mirea.dentalclinic.utils.daggerViewModel
 
 const val DOCTOR_LIST_ROUTE = "doctor_list"
 
-fun NavGraphBuilder.doctorList() {
+fun NavGraphBuilder.doctorList(navController: NavController) {
     composable(DOCTOR_LIST_ROUTE) {
         val appScope = appComponent()
         val componentViewModel: ComponentViewModel<DoctorListComponent> = daggerViewModel {
@@ -20,7 +20,7 @@ fun NavGraphBuilder.doctorList() {
         val viewModel = daggerViewModel {
             componentViewModel.component.doctorListViewModel()
         }
-        val presenter = DoctorListPresenterImpl(viewModel = viewModel)
+        val presenter = DoctorListPresenterImpl(viewModel = viewModel, navController = navController)
         DoctorListScreen(doctorListPresenter = presenter)
     }
 }

@@ -1,10 +1,13 @@
 package ru.mirea.dentalclinic.presentation.doctorlist
 
+import androidx.navigation.NavController
 import kotlinx.coroutines.flow.StateFlow
+import ru.mirea.dentalclinic.presentation.doctorpage.view.navigateToDoctorPage
 import javax.inject.Inject
 
 class DoctorListPresenterImpl(
-    private val viewModel: DoctorListViewModel
+    private val viewModel: DoctorListViewModel,
+    private val navController: NavController
 ): DoctorListPresenter {
     override val state: StateFlow<DoctorListState>
         get() = viewModel.state
@@ -17,4 +20,7 @@ class DoctorListPresenterImpl(
         viewModel.onNextPage()
     }
 
+    override fun navigateToDoctorPage(doctorId: Long) {
+        navController.navigateToDoctorPage(doctorId)
+    }
 }

@@ -9,11 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import ru.mirea.dentalclinic.presentation.appointment.view.appointmentScreen
 import ru.mirea.dentalclinic.presentation.doctorlist.view.doctorList
 import ru.mirea.dentalclinic.presentation.doctorpage.view.doctorPage
-import ru.mirea.dentalclinic.presentation.homescreen.view.HomeScreen
-import ru.mirea.dentalclinic.presentation.homescreen.HomeScreenPresenterImpl
-import ru.mirea.dentalclinic.presentation.homescreen.HomeViewModel
 import ru.mirea.dentalclinic.presentation.homescreen.view.HOME_SCREEN_ROUTE
 import ru.mirea.dentalclinic.presentation.homescreen.view.homeScreen
 import ru.mirea.dentalclinic.ui.theme.DentalClinicTheme
@@ -30,8 +28,9 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = HOME_SCREEN_ROUTE) {
                         homeScreen(navController)
-                        doctorList()
+                        doctorList(navController)
                         doctorPage(navController)
+                        appointmentScreen()
                     }
                 }
             }

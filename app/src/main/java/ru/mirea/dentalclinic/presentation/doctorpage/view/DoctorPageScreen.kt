@@ -17,7 +17,6 @@ import ru.mirea.dentalclinic.presentation.common.view.Loading
 import ru.mirea.dentalclinic.presentation.doctorpage.DoctorPagePresenter
 import ru.mirea.dentalclinic.presentation.doctorpage.DoctorPageState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DoctorPageScreen(presenter: DoctorPagePresenter) {
     val state = presenter.state.collectAsState().value
