@@ -1,5 +1,6 @@
 package ru.mirea.dentalclinic.di.features
 
+import android.content.Context
 import dagger.Component
 import ru.mirea.dentalclinic.domain.usecases.BookAppointmentUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetAppointmentsUseCase
@@ -10,6 +11,7 @@ interface AppointmentDependencies {
     val getAppointmentsUseCase: GetAppointmentsUseCase
     val getDoctorByIdUseCase: GetDoctorByIdUseCase
     val bookAppointmentUseCase: BookAppointmentUseCase
+    val context: Context
 }
 
 @Component(dependencies = [AppointmentDependencies::class])

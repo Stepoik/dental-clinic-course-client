@@ -16,6 +16,10 @@ class HomeScreenPresenterImpl(
         viewModel.update()
     }
 
+    override fun onErrorShowed() {
+        viewModel.onErrorShowed()
+    }
+
     override fun navigateToDoctorList() {
         navController.navigateToDoctorList()
     }

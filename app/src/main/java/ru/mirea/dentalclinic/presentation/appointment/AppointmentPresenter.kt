@@ -10,4 +10,6 @@ interface AppointmentPresenter {
     fun pickPreviousDay() {}
 
     fun pickNextDay() {}
+
+    fun bookAppointment(appointmentId: Long) {}
 }

@@ -1,5 +1,6 @@
 package ru.mirea.dentalclinic.presentation.homescreen.view
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,8 +33,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.R
@@ -65,7 +71,6 @@ import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
 import ru.mirea.dentalclinic.ui.theme.Blue40
 import ru.mirea.dentalclinic.ui.theme.DentalClinicTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(presenter: HomeScreenPresenter) {
     val state by presenter.state.collectAsState()
@@ -92,7 +97,6 @@ fun HomeScreen(presenter: HomeScreenPresenter) {
     }
 }
 
-// TODO: В будущем убрать навигацию отсюда
 @Composable
 fun PatientInfo(modifier: Modifier = Modifier, state: HomeScreenState) {
     val patientName = state.patient?.patientName ?: ""
@@ -236,6 +240,7 @@ fun defaultPresenter(state: HomeScreenState) = object : HomeScreenPresenter {
     override fun navigateToDoctorList() {}
     override fun navigateToDoctorPage(doctorId: Long) {}
     override fun navigateToAppointment(doctorId: Long) {}
+    override fun onErrorShowed() {}
 }
 
 @Composable

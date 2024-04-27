@@ -37,6 +37,10 @@ class HomeViewModel @Inject constructor(
         update()
     }
 
+    fun onErrorShowed() {
+        _state.update { it.copy(error = null) }
+    }
+
     fun update() {
         if (state.value.isLoading) {
             return
@@ -68,7 +72,7 @@ class HomeViewModel @Inject constructor(
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = false,
-                    error = it.message
+                    error = it
                 )
             }
             return body.invoke(it)

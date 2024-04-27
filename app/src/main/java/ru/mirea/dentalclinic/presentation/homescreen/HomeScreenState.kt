@@ -6,7 +6,7 @@ import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
 
 data class HomeScreenState(
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val error: Throwable? = null,
     val patient: PatientVO? = null,
     val procedures: List<ProcedureVO> = listOf(),
     val bestDoctors: List<DoctorVO> = listOf()

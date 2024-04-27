@@ -38,14 +38,15 @@ class DoctorPageViewModel @AssistedInject constructor(
         _state.value = DoctorPageState.Loading
         viewModelScope.launch {
             val doctorResult = getDoctorByIdUseCase.execute(doctorId)
-            doctorResult.onSuccess { doctor ->
-                _state.value = DoctorPageState.Success(
-                    doctor = doctorFormatter.format(doctor.doctor),
-                    procedures = doctor.procedures.map(procedureFormatter::format)
-                )
-            }.onFailure { throwable ->
-                _state.value = DoctorPageState.Error(throwable.message ?: "")
-            }
+            doctorResult
+                .onSuccess { doctor ->
+                    _state.value = DoctorPageState.Success(
+                        doctor = doctorFormatter.format(doctor.doctor),
+                        procedures = doctor.procedures.map(procedureFormatter::format)
+                    )
+                }.onFailure { throwable ->
+                    _state.value = DoctorPageState.Error(throwable.message ?: "")
+                }
         }
     }
 
@@ -56,7 +57,7 @@ class DoctorPageViewModel @AssistedInject constructor(
 }
 
 sealed class DoctorPageState {
-    object Idle: DoctorPageState()
+    object Idle : DoctorPageState()
     object Loading : DoctorPageState()
     data class Success(val doctor: DoctorVO, val procedures: List<ProcedureVO>) : DoctorPageState()
     data class Error(val error: String) : DoctorPageState()

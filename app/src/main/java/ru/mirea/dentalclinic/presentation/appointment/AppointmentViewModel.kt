@@ -12,12 +12,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.mirea.dentalclinic.domain.models.Appointment
 import ru.mirea.dentalclinic.domain.usecases.BookAppointmentUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetAppointmentsUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetDoctorByIdUseCase
@@ -39,6 +42,7 @@ class AppointmentViewModel @AssistedInject constructor(
     private val doctorFormatter: DoctorFormatter,
     private val bookAppointmentUseCase: BookAppointmentUseCase
 ) : ViewModel() {
+
     private val _state = MutableStateFlow<AppointmentScreenState>(AppointmentScreenState.Idle)
     private val _selectedDay = MutableStateFlow(Date())
     private var loadingJob: Job? = null
@@ -56,13 +60,27 @@ class AppointmentViewModel @AssistedInject constructor(
         get() = _state
 
     init {
-        loadAppointment()
-        viewModelScope.launch {
-            _selectedDay.collect {
-                loadAppointment()
-            }
-        }
+        _selectedDay.onEach {
+            loadAppointment()
+        }.launchIn(viewModelScope)
         updateHeader()
+    }
+
+    fun bookAppointment(appointmentId: Long) {
+        viewModelScope.launch {
+            val appointmentResult = bookAppointmentUseCase.execute(appointmentId)
+            appointmentResult.onFailure {
+
+            }.onSuccess { loadAppointment() }
+        }
+    }
+
+    fun pickPreviousDay() {
+        _selectedDay.update { it.decrease() }
+    }
+
+    fun pickNextDay() {
+        _selectedDay.update { it.increase() }
     }
 
     private fun updateHeader() {
@@ -86,27 +104,17 @@ class AppointmentViewModel @AssistedInject constructor(
         loadingJob?.cancel()
         loadingJob = viewModelScope.launch {
             val appointmentsResult = getAppointmentsUseCase.execute(_selectedDay.value, doctorId)
-            appointmentsResult.onSuccess { appointments ->
-                _state.value =
-                    AppointmentScreenState.Success(appointments.map(appointmentVOMapper::map))
-            }.onFailure {
-                _state.value = AppointmentScreenState.Error(it)
-            }
+            handleAppointmentResult(appointmentsResult)
         }
     }
 
-    fun bookAppointment(appointmentId: Long) {
-        viewModelScope.launch {
-            bookAppointmentUseCase.execute(appointmentId)
+    private fun handleAppointmentResult(appointmentsResult: Result<List<Appointment>>) {
+        appointmentsResult.onSuccess { appointments ->
+            _state.value =
+                AppointmentScreenState.Success(appointments.map(appointmentVOMapper::map))
+        }.onFailure {
+            _state.value = AppointmentScreenState.Error(it)
         }
-    }
-
-    fun pickPreviousDay() {
-        _selectedDay.update { it.decrease() }
-    }
-
-    fun pickNextDay() {
-        _selectedDay.update { it.increase() }
     }
 
     @AssistedFactory

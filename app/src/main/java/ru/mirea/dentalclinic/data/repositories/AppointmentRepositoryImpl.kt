@@ -31,7 +31,7 @@ class AppointmentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun bookAppointment(appointmentId: Long): Result<List<Appointment>> {
+    override suspend fun bookAppointment(appointmentId: Long): Result<Nothing> {
         // TODO: Сделать
         return Result.failure(Exception())
     }

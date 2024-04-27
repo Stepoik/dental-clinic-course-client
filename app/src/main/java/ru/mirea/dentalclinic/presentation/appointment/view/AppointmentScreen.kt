@@ -2,6 +2,7 @@ package ru.mirea.dentalclinic.presentation.appointment.view
 
 import androidx.compose.animation.core.repeatable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -58,7 +59,11 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
             DateHeader(presenter = presenter, modifier = Modifier.fillMaxWidth())
             when (state) {
                 is AppointmentScreenState.Success -> {
-                    AppointmentList(appointments = state.appointments, modifier = Modifier.padding(top = 10.dp))
+                    AppointmentList(
+                        appointments = state.appointments,
+                        presenter = presenter,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
                 }
 
                 is AppointmentScreenState.Loading -> {
@@ -74,13 +79,18 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
 }
 
 @Composable
-fun AppointmentList(appointments: List<AppointmentVO>, modifier: Modifier = Modifier) {
+fun AppointmentList(
+    appointments: List<AppointmentVO>,
+    presenter: AppointmentPresenter,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items(appointments) { appointment ->
             AppointmentItem(
                 appointment, modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
+                    .clickable { presenter.bookAppointment(appointment.id) }
             )
         }
     }
@@ -138,41 +148,14 @@ fun DateHeader(presenter: AppointmentPresenter, modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-@Preview
-private fun AppointmentListPreview() {
-    val item = AppointmentVO(
-        id = 0,
-        time = "12:30 - 12:40",
-        isOpened = true
-    )
-    DentalClinicTheme {
-        AppointmentList(appointments = List(5) { item }, modifier = Modifier.fillMaxWidth())
-    }
-}
 
-@Composable
-@Preview
-private fun AppointmentItemPreview() {
+private fun defaultPresenter(): AppointmentPresenter {
     val item = AppointmentVO(
         id = 0,
         time = "12:30 - 12:40",
         isOpened = true
     )
-    DentalClinicTheme {
-        AppointmentItem(appointment = item, modifier = Modifier.fillMaxWidth())
-    }
-}
-
-@Composable
-@Preview
-private fun AppointmentScreenPreview() {
-    val item = AppointmentVO(
-        id = 0,
-        time = "12:30 - 12:40",
-        isOpened = true
-    )
-    val presenter = object : AppointmentPresenter {
+    return object : AppointmentPresenter {
         override val selectedDay: StateFlow<String>
             get() = MutableStateFlow("")
         override val headerState: StateFlow<AppointmentScreenHeaderState>
@@ -195,6 +178,38 @@ private fun AppointmentScreenPreview() {
                 )
             )
     }
+}
+
+@Composable
+@Preview
+private fun AppointmentListPreview() {
+    val item = AppointmentVO(
+        id = 0,
+        time = "12:30 - 12:40",
+        isOpened = true
+    )
+    DentalClinicTheme {
+        AppointmentList(appointments = List(5) { item }, presenter = defaultPresenter(), modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+@Preview
+private fun AppointmentItemPreview() {
+    val item = AppointmentVO(
+        id = 0,
+        time = "12:30 - 12:40",
+        isOpened = true
+    )
+    DentalClinicTheme {
+        AppointmentItem(appointment = item, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+@Preview
+private fun AppointmentScreenPreview() {
+    val presenter = defaultPresenter()
     DentalClinicTheme {
         AppointmentScreen(presenter)
     }

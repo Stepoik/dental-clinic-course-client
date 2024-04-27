@@ -6,6 +6,8 @@ interface HomeScreenPresenter {
     val state: StateFlow<HomeScreenState>
     fun update()
 
+    fun onErrorShowed()
+
     fun navigateToDoctorList()
 
     fun navigateToDoctorPage(doctorId: Long)

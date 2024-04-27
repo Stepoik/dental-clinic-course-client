@@ -7,7 +7,7 @@ import javax.inject.Inject
 class BookAppointmentUseCase @Inject constructor(
     private val appointmentRepository: AppointmentRepository
 ) {
-    suspend fun execute(appointmentId: Long): Result<List<Appointment>> {
+    suspend fun execute(appointmentId: Long): Result<Nothing> {
         return appointmentRepository.bookAppointment(appointmentId)
     }
 }

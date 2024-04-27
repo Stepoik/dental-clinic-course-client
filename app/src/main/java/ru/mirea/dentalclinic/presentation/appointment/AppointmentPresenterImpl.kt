@@ -17,4 +17,8 @@ class AppointmentPresenterImpl(
     override fun pickNextDay() {
         viewModel.pickNextDay()
     }
+
+    override fun bookAppointment(appointmentId: Long) {
+        viewModel.bookAppointment(appointmentId)
+    }
 }
