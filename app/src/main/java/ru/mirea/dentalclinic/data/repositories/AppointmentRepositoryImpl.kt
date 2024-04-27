@@ -18,7 +18,7 @@ class AppointmentRepositoryImpl @Inject constructor(
     private val formatter: DateTimeFormatter =
         DateTimeFormatter.ofPattern(dateFormatPattern).withZone(ZoneId.systemDefault())
 
-    override suspend fun getRecordByDateAndDoctorId(
+    override suspend fun getAppointmentByDateAndDoctorId(
         date: Date,
         doctorId: Long
     ): Result<List<Appointment>> {
@@ -29,5 +29,10 @@ class AppointmentRepositoryImpl @Inject constructor(
             );
             appointments.appointments.map(appointmentDtoMapper::mapToDomain)
         }
+    }
+
+    override suspend fun bookAppointment(appointmentId: Long): Result<List<Appointment>> {
+        // TODO: Сделать
+        return Result.failure(Exception())
     }
 }

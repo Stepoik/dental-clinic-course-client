@@ -7,6 +7,8 @@ class AppointmentPresenterImpl(
 ) : AppointmentPresenter {
     override val selectedDay: StateFlow<String> = viewModel.selectedDay
     override val state: StateFlow<AppointmentScreenState> = viewModel.state
+    override val headerState: StateFlow<AppointmentScreenHeaderState>
+        get() = viewModel.headerState
 
     override fun pickPreviousDay() {
         viewModel.pickPreviousDay()

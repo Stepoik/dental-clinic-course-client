@@ -36,8 +36,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.R
 import ru.mirea.dentalclinic.presentation.appointment.AppointmentPresenter
+import ru.mirea.dentalclinic.presentation.appointment.AppointmentScreenHeaderState
 import ru.mirea.dentalclinic.presentation.appointment.AppointmentScreenState
 import ru.mirea.dentalclinic.presentation.appointment.models.AppointmentVO
+import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
 import ru.mirea.dentalclinic.presentation.common.view.Loading
 import ru.mirea.dentalclinic.ui.theme.Blue40
 import ru.mirea.dentalclinic.ui.theme.Blue80
@@ -47,17 +49,16 @@ import ru.mirea.dentalclinic.ui.theme.White
 @Composable
 fun AppointmentScreen(presenter: AppointmentPresenter) {
     val state = presenter.state.collectAsState().value
-    val day = presenter.selectedDay.collectAsState().value
     Scaffold { scaffoldPadding ->
         Column(
             Modifier
                 .padding(scaffoldPadding)
                 .fillMaxSize()
         ) {
-            DateHeader(date = day, presenter = presenter, modifier = Modifier.fillMaxWidth())
+            DateHeader(presenter = presenter, modifier = Modifier.fillMaxWidth())
             when (state) {
                 is AppointmentScreenState.Success -> {
-                    AppointmentList(appointments = state.appointments)
+                    AppointmentList(appointments = state.appointments, modifier = Modifier.padding(top = 10.dp))
                 }
 
                 is AppointmentScreenState.Loading -> {
@@ -65,7 +66,7 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
                 }
 
                 else -> {
-                    
+
                 }
             }
         }
@@ -76,9 +77,11 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
 fun AppointmentList(appointments: List<AppointmentVO>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items(appointments) { appointment ->
-            AppointmentItem(appointment, modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp))
+            AppointmentItem(
+                appointment, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+            )
         }
     }
 }
@@ -101,7 +104,10 @@ fun AppointmentItem(appointment: AppointmentVO, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DateHeader(date: String, presenter: AppointmentPresenter, modifier: Modifier = Modifier) {
+fun DateHeader(presenter: AppointmentPresenter, modifier: Modifier = Modifier) {
+    val day = presenter.selectedDay.collectAsState().value
+    val headerState = presenter.headerState.collectAsState().value
+    val doctorName = headerState.doctorVO?.name ?: ""
     Column(
         modifier = modifier.width(intrinsicSize = IntrinsicSize.Max),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -119,7 +125,7 @@ fun DateHeader(date: String, presenter: AppointmentPresenter, modifier: Modifier
                     contentDescription = "Previous day"
                 )
             }
-            Text(text = date)
+            Text(text = day)
             IconButton(onClick = presenter::pickNextDay) {
                 Icon(
                     modifier = Modifier.size(100.dp),
@@ -128,6 +134,7 @@ fun DateHeader(date: String, presenter: AppointmentPresenter, modifier: Modifier
                 )
             }
         }
+        Text(text = doctorName, fontSize = 20.sp)
     }
 }
 
@@ -168,6 +175,19 @@ private fun AppointmentScreenPreview() {
     val presenter = object : AppointmentPresenter {
         override val selectedDay: StateFlow<String>
             get() = MutableStateFlow("")
+        override val headerState: StateFlow<AppointmentScreenHeaderState>
+            get() = MutableStateFlow(
+                AppointmentScreenHeaderState(
+                    doctorVO = DoctorVO(
+                        id = 1,
+                        image = "",
+                        "Горохов С. В.",
+                        "",
+                        "",
+                        ""
+                    )
+                )
+            )
         override val state: StateFlow<AppointmentScreenState>
             get() = MutableStateFlow(
                 AppointmentScreenState.Success(
