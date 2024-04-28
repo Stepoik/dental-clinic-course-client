@@ -2,7 +2,9 @@ package ru.mirea.dentalclinic.di.features
 
 import android.content.Context
 import dagger.Component
+import ru.mirea.dentalclinic.domain.repositories.AuthLocalRepository
 import ru.mirea.dentalclinic.domain.usecases.GetBestDoctorsUseCase
+import ru.mirea.dentalclinic.domain.usecases.GetHomeInfoUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetProceduresUseCase
 import ru.mirea.dentalclinic.presentation.homescreen.HomeViewModel
 import javax.inject.Scope
@@ -11,8 +13,8 @@ import javax.inject.Scope
 annotation class HomeScreenScope
 
 interface HomeScreenDependencies {
-    val getBestDoctorsUseCase: GetBestDoctorsUseCase
-    val getProceduresUseCase: GetProceduresUseCase
+    val getHomeInfoUseCase: GetHomeInfoUseCase
+    val authLocalRepository: AuthLocalRepository
     val context: Context
 }
 

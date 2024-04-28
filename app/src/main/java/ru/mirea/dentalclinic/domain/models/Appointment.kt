@@ -7,5 +7,6 @@ data class Appointment(
     val start: Int,
     val end: Int,
     val isBooked: Boolean,
-    val day: Date
+    val day: Date,
+    val doctor: Doctor
 )

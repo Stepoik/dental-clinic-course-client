@@ -5,22 +5,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.mirea.dentalclinic.domain.models.Appointment
+import ru.mirea.dentalclinic.domain.models.Doctor
 import ru.mirea.dentalclinic.domain.usecases.BookAppointmentUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetAppointmentsUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetDoctorByIdUseCase
@@ -30,69 +24,61 @@ import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
 import ru.mirea.dentalclinic.utils.day
 import ru.mirea.dentalclinic.utils.decrease
 import ru.mirea.dentalclinic.utils.increase
-import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
 class AppointmentViewModel @AssistedInject constructor(
     @Assisted private val doctorId: Long,
     private val getAppointmentsUseCase: GetAppointmentsUseCase,
-    private val appointmentVOMapper: AppointmentVOMapper,
+    private val appointmentVOMapper: AppointmentVOFormatter,
     private val getDoctorByIdUseCase: GetDoctorByIdUseCase,
     private val doctorFormatter: DoctorFormatter,
     private val bookAppointmentUseCase: BookAppointmentUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AppointmentScreenState>(AppointmentScreenState.Idle)
-    private val _selectedDay = MutableStateFlow(Date())
+    private val _state = MutableStateFlow(AppointmentViewModelState())
     private var loadingJob: Job? = null
-    private val _headerState = MutableStateFlow(AppointmentScreenHeaderState())
-
-    val headerState: StateFlow<AppointmentScreenHeaderState>
-        get() = _headerState
-
-    val selectedDay: StateFlow<String>
-        get() = _selectedDay.map { date ->
-            date.day().toString()
-        }.stateIn(viewModelScope, SharingStarted.Lazily, "")
 
     val state: StateFlow<AppointmentScreenState>
-        get() = _state
+        get() = _state.map { it.toScreenState(appointmentVOMapper, doctorFormatter) }
+            .stateIn(viewModelScope, SharingStarted.Lazily, _state.value.toScreenState(appointmentVOMapper, doctorFormatter))
 
     init {
-        _selectedDay.onEach {
-            loadAppointment()
-        }.launchIn(viewModelScope)
         updateHeader()
+        loadAppointment()
     }
 
     fun bookAppointment(appointmentId: Long) {
         viewModelScope.launch {
             val appointmentResult = bookAppointmentUseCase.execute(appointmentId)
-            appointmentResult.onFailure {
-
+            appointmentResult.onFailure { _ ->
+                _state.update { it.copy(errorMessage = "Не удалось забронировать") }
             }.onSuccess { loadAppointment() }
         }
     }
 
     fun pickPreviousDay() {
-        _selectedDay.update { it.decrease() }
+        _state.update { it.copy(selectedDate = it.selectedDate.decrease()) }
+        loadAppointment()
     }
 
     fun pickNextDay() {
-        _selectedDay.update { it.increase() }
+        _state.update { it.copy(selectedDate = it.selectedDate.increase()) }
+        loadAppointment()
+    }
+
+    fun onErrorMessageShowed() {
+        _state.update { it.copy(errorMessage = null) }
     }
 
     private fun updateHeader() {
         viewModelScope.launch {
-            _headerState.update { it.copy(isLoading = true, error = null, doctorVO = null) }
             val doctorResult = getDoctorByIdUseCase.execute(doctorId)
             doctorResult.onSuccess { doctor ->
-                _headerState.update {
-                    it.copy(doctorVO = doctorFormatter.format(doctor.doctor))
+                _state.update {
+                    it.copy(doctor = doctor.doctor)
                 }
             }.onFailure { throwable ->
-                _headerState.update {
+                _state.update {
                     it.copy(error = throwable)
                 }
             }
@@ -100,20 +86,19 @@ class AppointmentViewModel @AssistedInject constructor(
     }
 
     private fun loadAppointment() {
-        _state.value = AppointmentScreenState.Loading
+        _state.update { it.copy(isLoading = true, error = null) }
         loadingJob?.cancel()
         loadingJob = viewModelScope.launch {
-            val appointmentsResult = getAppointmentsUseCase.execute(_selectedDay.value, doctorId)
+            val appointmentsResult = getAppointmentsUseCase.execute(_state.value.selectedDate, doctorId)
             handleAppointmentResult(appointmentsResult)
         }
     }
 
     private fun handleAppointmentResult(appointmentsResult: Result<List<Appointment>>) {
         appointmentsResult.onSuccess { appointments ->
-            _state.value =
-                AppointmentScreenState.Success(appointments.map(appointmentVOMapper::map))
-        }.onFailure {
-            _state.value = AppointmentScreenState.Error(it)
+            _state.update { it.copy(appointments = appointments, isLoading = false) }
+        }.onFailure { throwable ->
+            _state.update { it.copy(error = throwable, isLoading = false) }
         }
     }
 
@@ -123,15 +108,81 @@ class AppointmentViewModel @AssistedInject constructor(
     }
 }
 
-sealed class AppointmentScreenState {
-    object Idle : AppointmentScreenState()
-    object Loading : AppointmentScreenState()
-    data class Success(val appointments: List<AppointmentVO>) : AppointmentScreenState()
-    data class Error(val error: Throwable) : AppointmentScreenState()
+private data class AppointmentViewModelState(
+    val selectedDate: Date = Date(),
+    val doctor: Doctor? = null,
+    val isLoading: Boolean = false,
+    val error: Throwable? = null,
+    val errorMessage: String? = null,
+    val appointments: List<Appointment> = listOf()
+) {
+    fun toScreenState(mapper: AppointmentVOFormatter, doctorVOMapper: DoctorFormatter): AppointmentScreenState {
+        return when {
+            isLoading -> {
+                AppointmentScreenState.Loading(
+                    doctor = doctor?.let { doctorVOMapper.format(it) },
+                    date = selectedDate.day().toString(),
+                    errorMessage = errorMessage
+                )
+            }
+
+            error != null -> {
+                AppointmentScreenState.Error(
+                    error = error,
+                    doctor = doctor?.let { doctorVOMapper.format(it) },
+                    date = selectedDate.day().toString(),
+                    errorMessage = errorMessage
+                )
+            }
+
+            appointments.isNotEmpty() -> {
+                AppointmentScreenState.Success(
+                    appointments = appointments.map(mapper::map),
+                    doctor = doctor?.let { doctorVOMapper.format(it) },
+                    date = selectedDate.day().toString(),
+                    errorMessage = errorMessage
+                )
+            }
+
+            else -> {
+                AppointmentScreenState.Idle(
+                    doctor = doctor?.let { doctorVOMapper.format(it) },
+                    date = selectedDate.day().toString(),
+                    errorMessage = errorMessage
+                )
+            }
+        }
+    }
 }
 
-data class AppointmentScreenHeaderState(
-    val doctorVO: DoctorVO? = null,
-    val error: Throwable? = null,
-    val isLoading: Boolean = false
-)
+sealed interface AppointmentScreenState {
+    val doctor: DoctorVO?
+    val date: String
+    val errorMessage: String?
+
+    data class Idle(
+        override val doctor: DoctorVO?,
+        override val date: String,
+        override val errorMessage: String?
+    ) : AppointmentScreenState
+
+    data class Loading(
+        override val doctor: DoctorVO?,
+        override val date: String,
+        override val errorMessage: String?
+    ) : AppointmentScreenState
+
+    data class Success(
+        val appointments: List<AppointmentVO>,
+        override val doctor: DoctorVO?,
+        override val date: String,
+        override val errorMessage: String?
+    ) : AppointmentScreenState
+
+    data class Error(
+        val error: Throwable,
+        override val doctor: DoctorVO?,
+        override val date: String,
+        override val errorMessage: String?
+    ) : AppointmentScreenState
+}

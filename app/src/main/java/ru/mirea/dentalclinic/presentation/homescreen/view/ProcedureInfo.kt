@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,7 +40,7 @@ import ru.mirea.dentalclinic.ui.theme.Blue40
 fun ProceduresInfo(modifier: Modifier = Modifier, homeScreenState: HomeScreenState) {
     Column(modifier = modifier) {
         CarouselHeader(title = stringResource(id = R.string.procedures))
-        ProcedureCarousel(modifier = Modifier.padding(top = 28.dp), homeScreenState)
+        ProcedureCarousel(modifier = Modifier.padding(top = 28.dp).fillMaxSize(), homeScreenState)
     }
 }
 

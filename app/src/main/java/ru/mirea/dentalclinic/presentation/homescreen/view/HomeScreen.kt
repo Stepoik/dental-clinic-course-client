@@ -1,34 +1,23 @@
 package ru.mirea.dentalclinic.presentation.homescreen.view
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,46 +25,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.R
+import ru.mirea.dentalclinic.domain.models.Appointment
+import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
 import ru.mirea.dentalclinic.presentation.homescreen.HomeScreenPresenter
 import ru.mirea.dentalclinic.presentation.homescreen.HomeScreenState
-import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
-import ru.mirea.dentalclinic.presentation.doctorlist.view.navigateToDoctorList
+import ru.mirea.dentalclinic.presentation.homescreen.models.HomeAppointmentVO
 import ru.mirea.dentalclinic.presentation.homescreen.models.PatientVO
 import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
 import ru.mirea.dentalclinic.ui.theme.Blue40
+import ru.mirea.dentalclinic.ui.theme.Blue80
 import ru.mirea.dentalclinic.ui.theme.DentalClinicTheme
 
 @Composable
 fun HomeScreen(presenter: HomeScreenPresenter) {
-    val state by presenter.state.collectAsState()
+    val state = presenter.state.collectAsState().value
     val scrollState = rememberScrollState()
     val refreshState = rememberSwipeRefreshState(isRefreshing = state.isLoading)
+    LaunchedEffect(state.isLogged) {
+        if (!state.isLogged) {
+            presenter.navigateToAuth()
+        }
+    }
     Scaffold { scaffoldPadding ->
         SwipeRefresh(state = refreshState, onRefresh = { presenter.update() }) {
             Column(
@@ -85,12 +70,20 @@ fun HomeScreen(presenter: HomeScreenPresenter) {
                     .background(MaterialTheme.colorScheme.primary)
                     .verticalScroll(scrollState)
             ) {
-                PatientInfo(state = state)
+                PatientInfo(state = state, presenter = presenter)
+                if (state.appointment != null) {
+                    AppointmentInfo(
+                        appointment = state.appointment,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 ProceduresInfo(modifier = Modifier.padding(top = 40.dp), homeScreenState = state)
                 BestDoctorsInfo(
                     presenter = presenter,
                     state = state,
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .weight(1f)
                 )
             }
         }
@@ -98,7 +91,11 @@ fun HomeScreen(presenter: HomeScreenPresenter) {
 }
 
 @Composable
-fun PatientInfo(modifier: Modifier = Modifier, state: HomeScreenState) {
+fun PatientInfo(
+    state: HomeScreenState,
+    presenter: HomeScreenPresenter,
+    modifier: Modifier = Modifier
+) {
     val patientName = state.patient?.patientName ?: ""
     Row(modifier = modifier.padding(25.dp), verticalAlignment = Alignment.CenterVertically) {
         Image(
@@ -116,118 +113,56 @@ fun PatientInfo(modifier: Modifier = Modifier, state: HomeScreenState) {
                 text = patientName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp,
-                color = Color.Black
+                color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
+        Text(
+            text = stringResource(id = R.string.logout),
+            color = Blue40,
+            modifier = Modifier.clickable(onClick = presenter::logout)
+        )
     }
 }
 
 @Composable
-fun BestDoctorsInfo(
-    modifier: Modifier = Modifier,
-    presenter: HomeScreenPresenter,
-    state: HomeScreenState
-) {
-    Column(modifier = modifier) {
-        CarouselHeader(title = stringResource(id = R.string.best_doctors), onShowAllClicked = {
-            presenter.navigateToDoctorList()
-        })
-        DoctorCarousel(modifier = Modifier.padding(top = 28.dp), state, presenter)
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun DoctorCarousel(
-    modifier: Modifier = Modifier,
-    state: HomeScreenState,
-    presenter: HomeScreenPresenter
-) {
-    val doctors = state.bestDoctors
-    val lazyState = rememberLazyListState()
-    LazyRow(
-        modifier = modifier,
-        flingBehavior = rememberSnapFlingBehavior(lazyListState = lazyState),
-        state = lazyState
+fun AppointmentInfo(appointment: HomeAppointmentVO, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .width(IntrinsicSize.Max)
+            .padding(horizontal = 25.dp)
     ) {
-        item {
-            Spacer(modifier = Modifier.padding(12.dp))
-        }
-        items(doctors) { doctor ->
-            DoctorCard(
-                doctor,
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .clickable(onClick = { presenter.navigateToDoctorPage(doctor.id) })
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun DoctorCard(doctor: DoctorVO, modifier: Modifier = Modifier) {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp
-    val cardWidth = (screenWidth * 0.7).dp
-    Card(
-        modifier = modifier.defaultMinSize(minWidth = cardWidth),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
-                model = doctor.image,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .size(height = 120.dp, width = 100.dp)
-                    .background(Color.White)
-            )
-            Column(Modifier.padding(start = 16.dp)) {
-                Text(
-                    text = doctor.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight(600),
-                    color = Blue40
-                )
-                Text(
-                    text = doctor.specialization,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight(400),
-                    color = Color.Black,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                FlowRow(
-                    Modifier.padding(top = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    DoctorInformation(
-                        painter = painterResource(id = R.drawable.backpack),
-                        text = doctor.experience
-                    )
-                    DoctorInformation(
-                        painter = rememberVectorPainter(Icons.Filled.Star),
-                        text = doctor.rate
-                    )
-                }
+        Text(
+            text = stringResource(id = R.string.nearest_appointment),
+            fontSize = 18.sp,
+            fontWeight = FontWeight(600)
+        )
+        Card(
+            modifier = Modifier.padding(top = 28.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
+        ) {
+            Column(
+                Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = appointment.doctorName, color = Blue40, maxLines = 1)
+                Text(text = appointment.time, color = Blue40)
             }
         }
     }
 }
 
 @Composable
-fun DoctorInformation(painter: Painter, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Image(painter = painter, contentDescription = text, Modifier.size(20.dp))
-        Text(
-            text = text,
-            modifier = Modifier.padding(start = 4.dp),
-            color = Color.Black,
-            fontSize = 12.sp,
-            fontWeight = FontWeight(400)
-        )
+@Preview
+fun AppointmentInfoPreview() {
+    val homeAppointment = HomeAppointmentVO(
+        time = "23:00 - 24:00",
+        doctorName = "Степан Горохов"
+    )
+    DentalClinicTheme {
+        AppointmentInfo(appointment = homeAppointment, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -241,33 +176,15 @@ fun defaultPresenter(state: HomeScreenState) = object : HomeScreenPresenter {
     override fun navigateToDoctorPage(doctorId: Long) {}
     override fun navigateToAppointment(doctorId: Long) {}
     override fun onErrorShowed() {}
-}
-
-@Composable
-@Preview
-fun BestDoctorsInfoPreview() {
-    val state = HomeScreenState(
-        bestDoctors = listOf(
-            DoctorVO(
-                id = 0,
-                name = "Горохов С.В.",
-                specialization = "Стоматолог",
-                experience = "4 года",
-                rate = "4,7",
-                image = ""
-            )
-        )
-    )
-    DentalClinicTheme {
-        BestDoctorsInfo(modifier = Modifier.fillMaxWidth(), defaultPresenter(state), state)
-    }
+    override fun logout() {}
+    override fun navigateToAuth() {}
 }
 
 @Composable
 @Preview
 fun PatientInfoPreview() {
     val state = HomeScreenState()
-    PatientInfo(Modifier.fillMaxWidth(), state)
+    PatientInfo(modifier = Modifier.fillMaxWidth(), presenter = defaultPresenter(state), state = state)
 }
 
 @Composable

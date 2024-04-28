@@ -2,31 +2,34 @@ package ru.mirea.dentalclinic.presentation.homescreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.onSubscription
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.mirea.dentalclinic.domain.repositories.AuthLocalRepository
 import ru.mirea.dentalclinic.domain.usecases.GetBestDoctorsUseCase
+import ru.mirea.dentalclinic.domain.usecases.GetHomeInfoUseCase
+import ru.mirea.dentalclinic.domain.usecases.GetPatientInfoUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetProceduresUseCase
+import ru.mirea.dentalclinic.presentation.appointment.models.AppointmentVO
 import ru.mirea.dentalclinic.presentation.common.formatters.DoctorFormatter
+import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
+import ru.mirea.dentalclinic.presentation.homescreen.formatters.HomeAppointmentFormatter
+import ru.mirea.dentalclinic.presentation.homescreen.formatters.PatientFormatter
 import ru.mirea.dentalclinic.presentation.homescreen.formatters.ProcedureFormatter
+import ru.mirea.dentalclinic.presentation.homescreen.models.HomeAppointmentVO
+import ru.mirea.dentalclinic.presentation.homescreen.models.PatientVO
+import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(
-    private val getBestDoctorsUseCase: GetBestDoctorsUseCase,
-    private val getProceduresUseCase: GetProceduresUseCase,
+    private val getHomeInfoUseCase: GetHomeInfoUseCase,
     private val doctorFormatter: DoctorFormatter,
-    private val procedureFormatter: ProcedureFormatter
+    private val procedureFormatter: ProcedureFormatter,
+    private val patientFormatter: PatientFormatter,
+    private val homeAppointmentFormatter: HomeAppointmentFormatter,
+    private val authLocalRepository: AuthLocalRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeScreenState())
 
@@ -41,27 +44,37 @@ class HomeViewModel @Inject constructor(
         _state.update { it.copy(error = null) }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            authLocalRepository.logout()
+            _state.update { it.copy(isLogged = false) }
+        }
+    }
+
     fun update() {
         if (state.value.isLoading) {
             return
         }
-        _state.update {
-            it.copy(
+        _state.update { currentState ->
+            currentState.copy(
                 isLoading = true,
                 error = null
             )
         }
         viewModelScope.launch {
-            val doctorsJob = async { getBestDoctorsUseCase.execute() }
-            val procedureJob = async { getProceduresUseCase.execute() }
-            val doctorsPage = doctorsJob.await().onError { return@launch }
-            val procedures = procedureJob.await().onError { return@launch }
+            val homeInfoResult = getHomeInfoUseCase.execute()
+            val homeInfo = homeInfoResult.onError { return@launch }
             _state.update { currentState ->
                 currentState.copy(
                     isLoading = false,
-                    error = null,
-                    bestDoctors = doctorsPage.doctors.map(doctorFormatter::format),
-                    procedures = procedures.map(procedureFormatter::format)
+                    patient = patientFormatter.format(homeInfo.patient),
+                    bestDoctors = homeInfo.doctorPage.doctors.map(doctorFormatter::format),
+                    procedures = homeInfo.procedures.map(procedureFormatter::format),
+                    appointment = homeInfo.nearestAppointment?.let {
+                        homeAppointmentFormatter.format(
+                            it
+                        )
+                    }
                 )
             }
         }
@@ -79,3 +92,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 }
+
+data class HomeScreenState(
+    val isLogged: Boolean = true,
+    val isLoading: Boolean = false,
+    val error: Throwable? = null,
+    val patient: PatientVO? = null,
+    val appointment: HomeAppointmentVO? = null,
+    val procedures: List<ProcedureVO> = listOf(),
+    val bestDoctors: List<DoctorVO> = listOf()
+)

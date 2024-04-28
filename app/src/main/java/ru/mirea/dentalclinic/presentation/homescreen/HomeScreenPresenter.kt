@@ -8,6 +8,10 @@ interface HomeScreenPresenter {
 
     fun onErrorShowed()
 
+    fun logout()
+
+    fun navigateToAuth()
+
     fun navigateToDoctorList()
 
     fun navigateToDoctorPage(doctorId: Long)

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">DentalClinic</string>
+    <string name="nearest_appointment">Ближайшая запись</string>
     <string name="appointment">Записаться к врачу</string>
     <string name="patient">Пациент</string>
     <string name="procedures">Процедуры</string>
@@ -7,6 +8,13 @@
     <string name="best_doctors">Лучшие доктора</string>
     <string name="appointments">Записи</string>
     <string name="network_error">Ошибка при загрузке((</string>
+    <string name="logout">Выйти</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="password">Пароль</string>
+    <string name="username">Логин</string>
+    <string name="empty_appointment_list">На этот день нет записей</string>
+    <string name="auth_error">Неверные данные</string>
     <plurals name="doctor">
         <item quantity="one">%d доктор</item>
         <item quantity="few">%d доктора</item>

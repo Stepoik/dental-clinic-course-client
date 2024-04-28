@@ -1,4 +1,4 @@
-package ru.mirea.dentalclinic.presentation.common.view
+package ru.mirea.dentalclinic.presentation.common.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

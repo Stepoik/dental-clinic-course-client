@@ -5,10 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 class AppointmentPresenterImpl(
     private val viewModel: AppointmentViewModel
 ) : AppointmentPresenter {
-    override val selectedDay: StateFlow<String> = viewModel.selectedDay
     override val state: StateFlow<AppointmentScreenState> = viewModel.state
-    override val headerState: StateFlow<AppointmentScreenHeaderState>
-        get() = viewModel.headerState
 
     override fun pickPreviousDay() {
         viewModel.pickPreviousDay()
@@ -20,5 +17,9 @@ class AppointmentPresenterImpl(
 
     override fun bookAppointment(appointmentId: Long) {
         viewModel.bookAppointment(appointmentId)
+    }
+
+    override fun onErrorMessageShowed() {
+        viewModel.onErrorMessageShowed()
     }
 }

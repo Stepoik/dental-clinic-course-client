@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,8 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.mirea.dentalclinic.R
-import ru.mirea.dentalclinic.presentation.appointment.AppointmentPresenter
-import ru.mirea.dentalclinic.presentation.common.view.Loading
+import ru.mirea.dentalclinic.presentation.common.components.Loading
 import ru.mirea.dentalclinic.presentation.doctorpage.DoctorPagePresenter
 import ru.mirea.dentalclinic.presentation.doctorpage.DoctorPageState
 

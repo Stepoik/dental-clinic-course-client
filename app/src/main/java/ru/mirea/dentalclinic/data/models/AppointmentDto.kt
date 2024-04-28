@@ -13,5 +13,7 @@ data class AppointmentDto(
     @SerializedName("is_booked")
     val isBooked: Boolean,
     @SerializedName("day")
-    val day: Date
+    val day: Date,
+    @SerializedName("doctor")
+    val doctor: DoctorDto
 )

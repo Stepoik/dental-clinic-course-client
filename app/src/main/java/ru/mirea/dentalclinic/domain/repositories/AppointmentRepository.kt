@@ -6,5 +6,7 @@ import java.util.Date
 interface AppointmentRepository {
     suspend fun getAppointmentByDateAndDoctorId(date: Date, doctorId: Long): Result<List<Appointment>>
 
-    suspend fun bookAppointment(appointmentId: Long): Result<Nothing>
+    suspend fun bookAppointment(appointmentId: Long): Result<Appointment>
+
+    suspend fun getUserAppointments(): Result<List<Appointment>>
 }

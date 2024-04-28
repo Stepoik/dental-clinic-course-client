@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
+    implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.accompanist.swiperefresh)
     implementation(libs.androidx.navigation.compose)

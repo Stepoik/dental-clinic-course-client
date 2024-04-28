@@ -1,9 +1,10 @@
 package ru.mirea.dentalclinic.presentation.appointment.view
 
-import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -18,30 +19,36 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ru.mirea.dentalclinic.App
 import ru.mirea.dentalclinic.R
 import ru.mirea.dentalclinic.presentation.appointment.AppointmentPresenter
-import ru.mirea.dentalclinic.presentation.appointment.AppointmentScreenHeaderState
 import ru.mirea.dentalclinic.presentation.appointment.AppointmentScreenState
 import ru.mirea.dentalclinic.presentation.appointment.models.AppointmentVO
 import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
-import ru.mirea.dentalclinic.presentation.common.view.Loading
+import ru.mirea.dentalclinic.presentation.common.components.Loading
 import ru.mirea.dentalclinic.ui.theme.Blue40
 import ru.mirea.dentalclinic.ui.theme.Blue80
 import ru.mirea.dentalclinic.ui.theme.DentalClinicTheme
@@ -50,31 +57,80 @@ import ru.mirea.dentalclinic.ui.theme.White
 @Composable
 fun AppointmentScreen(presenter: AppointmentPresenter) {
     val state = presenter.state.collectAsState().value
+    var showError by remember {
+        mutableStateOf(true)
+    }
+    LaunchedEffect(state.errorMessage) {
+        if (state.errorMessage != null) {
+            showError = true
+            delay(1000)
+            presenter.onErrorMessageShowed()
+        } else {
+            showError = false
+        }
+    }
     Scaffold { scaffoldPadding ->
-        Column(
-            Modifier
-                .padding(scaffoldPadding)
+        Box(
+            modifier = Modifier
                 .fillMaxSize()
+                .padding(scaffoldPadding)
         ) {
-            DateHeader(presenter = presenter, modifier = Modifier.fillMaxWidth())
-            when (state) {
-                is AppointmentScreenState.Success -> {
-                    AppointmentList(
-                        appointments = state.appointments,
-                        presenter = presenter,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                }
+            Column(
+                Modifier
+                    .padding(scaffoldPadding)
+                    .fillMaxSize()
+            ) {
+                DateHeader(
+                    date = state.date,
+                    doctor = state.doctor,
+                    presenter = presenter,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                when (state) {
+                    is AppointmentScreenState.Success -> {
+                        AppointmentList(
+                            appointments = state.appointments,
+                            presenter = presenter,
+                            modifier = Modifier.padding(top = 10.dp)
+                        )
+                    }
 
-                is AppointmentScreenState.Loading -> {
-                    Loading(modifier = Modifier.fillMaxSize())
-                }
+                    is AppointmentScreenState.Loading -> {
+                        Loading(modifier = Modifier.fillMaxSize())
+                    }
 
-                else -> {
+                    is AppointmentScreenState.Error -> {
+                        Text(state.error.message ?: "")
+                    }
 
+                    is AppointmentScreenState.Idle -> {
+                        EmptyAppointmentList(modifier = Modifier.fillMaxSize())
+                    }
                 }
             }
+            AnimatedVisibility(
+                visible = showError,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                Text(
+                    text = state.errorMessage ?: "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Blue40)
+                        .padding(vertical = 10.dp),
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
+    }
+}
+
+@Composable
+fun EmptyAppointmentList(modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Text(text = stringResource(id = R.string.empty_appointment_list), fontSize = 30.sp, color = Blue40)
     }
 }
 
@@ -89,15 +145,19 @@ fun AppointmentList(
             AppointmentItem(
                 appointment, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
-                    .clickable { presenter.bookAppointment(appointment.id) }
+                    .padding(horizontal = 10.dp),
+                onClick = { presenter.bookAppointment(appointment.id) }
             )
         }
     }
 }
 
 @Composable
-fun AppointmentItem(appointment: AppointmentVO, modifier: Modifier = Modifier) {
+fun AppointmentItem(
+    appointment: AppointmentVO,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     val backgroundColor = if (appointment.isOpened) {
         Blue80
     } else {
@@ -106,6 +166,7 @@ fun AppointmentItem(appointment: AppointmentVO, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
             .background(backgroundColor)
             .padding(10.dp), horizontalArrangement = Arrangement.Center
     ) {
@@ -114,10 +175,13 @@ fun AppointmentItem(appointment: AppointmentVO, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DateHeader(presenter: AppointmentPresenter, modifier: Modifier = Modifier) {
-    val day = presenter.selectedDay.collectAsState().value
-    val headerState = presenter.headerState.collectAsState().value
-    val doctorName = headerState.doctorVO?.name ?: ""
+fun DateHeader(
+    date: String,
+    doctor: DoctorVO?,
+    presenter: AppointmentPresenter,
+    modifier: Modifier = Modifier
+) {
+    val doctorName = doctor?.name ?: ""
     Column(
         modifier = modifier.width(intrinsicSize = IntrinsicSize.Max),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -135,7 +199,7 @@ fun DateHeader(presenter: AppointmentPresenter, modifier: Modifier = Modifier) {
                     contentDescription = "Previous day"
                 )
             }
-            Text(text = day)
+            Text(text = date, fontSize = 20.sp)
             IconButton(onClick = presenter::pickNextDay) {
                 Icon(
                     modifier = Modifier.size(100.dp),
@@ -156,25 +220,19 @@ private fun defaultPresenter(): AppointmentPresenter {
         isOpened = true
     )
     return object : AppointmentPresenter {
-        override val selectedDay: StateFlow<String>
-            get() = MutableStateFlow("")
-        override val headerState: StateFlow<AppointmentScreenHeaderState>
-            get() = MutableStateFlow(
-                AppointmentScreenHeaderState(
-                    doctorVO = DoctorVO(
-                        id = 1,
-                        image = "",
-                        "Горохов С. В.",
-                        "",
-                        "",
-                        ""
-                    )
-                )
-            )
         override val state: StateFlow<AppointmentScreenState>
             get() = MutableStateFlow(
                 AppointmentScreenState.Success(
-                    appointments = List(20) { item }
+                    appointments = List(20) { item },
+                    doctor = DoctorVO(
+                        id = 1,
+                        image = "",
+                        name = "Степан",
+                        specialization = "Хирург",
+                        experience = "4 года",
+                        rate = "4"
+                    ),
+                    date = "4 марта", errorMessage = "Ошибка"
                 )
             )
     }
@@ -189,7 +247,11 @@ private fun AppointmentListPreview() {
         isOpened = true
     )
     DentalClinicTheme {
-        AppointmentList(appointments = List(5) { item }, presenter = defaultPresenter(), modifier = Modifier.fillMaxWidth())
+        AppointmentList(
+            appointments = List(5) { item },
+            presenter = defaultPresenter(),
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

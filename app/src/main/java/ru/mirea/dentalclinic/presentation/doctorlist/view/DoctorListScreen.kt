@@ -46,8 +46,9 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.R
+import ru.mirea.dentalclinic.presentation.common.components.DefaultTextField
 import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
-import ru.mirea.dentalclinic.presentation.common.view.Loading
+import ru.mirea.dentalclinic.presentation.common.components.Loading
 import ru.mirea.dentalclinic.presentation.doctorlist.DoctorListPresenter
 import ru.mirea.dentalclinic.presentation.doctorlist.DoctorListState
 import ru.mirea.dentalclinic.ui.theme.Blue40
@@ -180,17 +181,7 @@ fun DoctorItem(modifier: Modifier = Modifier, doctor: DoctorVO) {
 
 @Composable
 fun SearchBar(value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Blue40,
-            unfocusedBorderColor = Blue40,
-            cursorColor = Color.Black
-        )
-    )
+    DefaultTextField(value = value, onValueChange = onValueChange, modifier = modifier)
 }
 
 

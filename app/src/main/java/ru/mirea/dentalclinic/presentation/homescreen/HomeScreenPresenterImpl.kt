@@ -3,6 +3,8 @@ package ru.mirea.dentalclinic.presentation.homescreen
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.presentation.appointment.view.navigateToAppointmentScreen
+import ru.mirea.dentalclinic.presentation.authentication.AUTHENTICATION_ROUTE
+import ru.mirea.dentalclinic.presentation.authentication.login.LOGIN_ROUTE
 import ru.mirea.dentalclinic.presentation.doctorlist.view.navigateToDoctorList
 import ru.mirea.dentalclinic.presentation.doctorpage.view.navigateToDoctorPage
 
@@ -18,6 +20,18 @@ class HomeScreenPresenterImpl(
 
     override fun onErrorShowed() {
         viewModel.onErrorShowed()
+    }
+
+    override fun logout() {
+        viewModel.logout()
+    }
+
+    override fun navigateToAuth() {
+        navController.navigate(AUTHENTICATION_ROUTE) {
+            popUpTo(navController.currentDestination?.route ?: "") {
+                inclusive = true
+            }
+        }
     }
 
     override fun navigateToDoctorList() {

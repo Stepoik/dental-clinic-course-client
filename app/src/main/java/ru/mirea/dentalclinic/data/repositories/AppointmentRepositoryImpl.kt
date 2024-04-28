@@ -23,7 +23,7 @@ class AppointmentRepositoryImpl @Inject constructor(
         doctorId: Long
     ): Result<List<Appointment>> {
         return runCatching {
-            val appointments = appointmentService.getRecordByDateAndDoctorId(
+            val appointments = appointmentService.getAppointmentsByDateAndDoctorId(
                 formatter.format(date.toInstant()),
                 doctorId
             );
@@ -31,8 +31,17 @@ class AppointmentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun bookAppointment(appointmentId: Long): Result<Nothing> {
-        // TODO: Сделать
-        return Result.failure(Exception())
+    override suspend fun bookAppointment(appointmentId: Long): Result<Appointment> {
+        return runCatching {
+            val appointmentDto = appointmentService.bookAppointment(appointmentId)
+            appointmentDtoMapper.mapToDomain(appointmentDto)
+        }
+    }
+
+    override suspend fun getUserAppointments(): Result<List<Appointment>> {
+        return runCatching {
+            val appointments = appointmentService.getUserAppointments()
+            appointments.appointments.map(appointmentDtoMapper::mapToDomain)
+        }
     }
 }

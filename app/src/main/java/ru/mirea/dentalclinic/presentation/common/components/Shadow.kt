@@ -1,4 +1,4 @@
-package ru.mirea.dentalclinic.presentation.common.view
+package ru.mirea.dentalclinic.presentation.common.components
 
 import android.graphics.BlurMaskFilter
 import androidx.compose.ui.Modifier
