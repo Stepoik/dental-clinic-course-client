@@ -1,9 +1,8 @@
-package ru.mirea.dentalclinic.presentation.doctorlist
+package ru.mirea.dentalclinic.presentation.doctorsearch
 
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.presentation.doctorpage.view.navigateToDoctorPage
-import javax.inject.Inject
 
 class DoctorListPresenterImpl(
     private val viewModel: DoctorListViewModel,

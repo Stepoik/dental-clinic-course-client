@@ -2,11 +2,9 @@ package ru.mirea.dentalclinic.presentation.homescreen.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,38 +31,55 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.mirea.dentalclinic.R
 import ru.mirea.dentalclinic.presentation.homescreen.HomeScreenState
-import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
+import ru.mirea.dentalclinic.presentation.common.models.ProcedureVO
+import ru.mirea.dentalclinic.presentation.homescreen.HomeScreenPresenter
 import ru.mirea.dentalclinic.ui.theme.Blue40
 
 @Composable
-fun ProceduresInfo(modifier: Modifier = Modifier, homeScreenState: HomeScreenState) {
+fun ProceduresInfo(
+    presenter: HomeScreenPresenter,
+    homeScreenState: HomeScreenState,
+    modifier: Modifier = Modifier,
+    onItemClick: (String) -> Unit = {}
+) {
     Column(modifier = modifier) {
-        CarouselHeader(title = stringResource(id = R.string.procedures))
-        ProcedureCarousel(modifier = Modifier.padding(top = 28.dp).fillMaxSize(), homeScreenState)
+        CarouselHeader(title = stringResource(id = R.string.procedures), onShowAllClicked = {
+            presenter.navigateToProcedures()
+        })
+        ProcedureCarousel(
+            modifier = Modifier.padding(top = 28.dp),
+            homeScreenState,
+            onItemClick = onItemClick
+        )
     }
 }
 
 @Composable
-fun ProcedureCarousel(modifier: Modifier = Modifier, homeScreenState: HomeScreenState) {
+fun ProcedureCarousel(
+    modifier: Modifier = Modifier,
+    homeScreenState: HomeScreenState,
+    onItemClick: (String) -> Unit
+) {
     val procedures = homeScreenState.procedures
     LazyRow(modifier = modifier.padding(bottom = 10.dp)) {
         item {
             Spacer(modifier = modifier.padding(13.dp))
         }
         items(procedures) { procedure ->
-            ProcedureCard(procedure = procedure, modifier = Modifier.padding(end = 16.dp))
+            ProcedureCard(procedure = procedure, modifier = Modifier.padding(end = 16.dp), onItemClick = onItemClick)
         }
     }
 }
 
 @Composable
-fun ProcedureCard(modifier: Modifier = Modifier, procedure: ProcedureVO) {
+fun ProcedureCard(procedure: ProcedureVO, modifier: Modifier = Modifier, onItemClick: (String) -> Unit = {}) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val cardWidth = (screenWidth * 0.7).dp
     Card(
         modifier = modifier.width(cardWidth),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp),
+        onClick = { onItemClick.invoke(procedure.name)}
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
@@ -95,16 +110,4 @@ fun ProcedureCard(modifier: Modifier = Modifier, procedure: ProcedureVO) {
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun ProcedureInfoPreview() {
-    val state = HomeScreenState(
-        procedures = listOf(
-            ProcedureVO(name = "Хирург", doctorCount = "15 докторов"),
-            ProcedureVO(name = "Хирург", doctorCount = "15 докторов")
-        )
-    )
-    ProceduresInfo(Modifier.fillMaxWidth(), state)
 }

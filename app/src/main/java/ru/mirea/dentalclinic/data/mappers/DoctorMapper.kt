@@ -14,7 +14,7 @@ class DoctorMapper @Inject constructor() {
             image = doctorDto.image ?: "",
             rate = doctorDto.rate ?: 0f,
             experience = doctorDto.experience ?: 0,
-            specialization = doctorDto.specialization ?: ""
+            specialization = doctorDto.specialization?.specialization ?: ""
         )
     }
 }

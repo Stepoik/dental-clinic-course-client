@@ -15,6 +15,10 @@ import ru.mirea.dentalclinic.di.features.LoginScreenComponent
 import ru.mirea.dentalclinic.di.features.LoginScreenDependencies
 import ru.mirea.dentalclinic.di.features.MainActivityComponent
 import ru.mirea.dentalclinic.di.features.MainActivityDependencies
+import ru.mirea.dentalclinic.di.features.ProcedureDoctorsComponent
+import ru.mirea.dentalclinic.di.features.ProcedureDoctorsDependencies
+import ru.mirea.dentalclinic.di.features.ProceduresComponent
+import ru.mirea.dentalclinic.di.features.ProceduresDependencies
 import ru.mirea.dentalclinic.di.features.RegistrationDependencies
 import ru.mirea.dentalclinic.di.features.RegistrationScreenComponent
 import ru.mirea.dentalclinic.di.features.SplashScreenComponent
@@ -51,7 +55,9 @@ interface AppComponent :
     MainActivityDependencies,
     SplashScreenDependencies,
     LoginScreenDependencies,
-    RegistrationDependencies {
+    RegistrationDependencies,
+    ProceduresDependencies,
+    ProcedureDoctorsDependencies {
 
     @Component.Factory
     interface Factory {
@@ -73,4 +79,8 @@ interface AppComponent :
     fun loginScreenComponent(): LoginScreenComponent
 
     fun registrationScreenComponent(): RegistrationScreenComponent
+
+    fun proceduresComponent(): ProceduresComponent
+
+    fun procedureDoctorComponent(): ProcedureDoctorsComponent
 }

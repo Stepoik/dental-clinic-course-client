@@ -10,4 +10,6 @@ interface DoctorRepository {
     suspend fun searchDoctors(query: String, page: Int): Result<DoctorPage>
 
     suspend fun getDoctorById(doctorId: Long): Result<Doctor>
+
+    suspend fun getDoctorsByProcedure(procedureName: String): Result<List<Doctor>>
 }

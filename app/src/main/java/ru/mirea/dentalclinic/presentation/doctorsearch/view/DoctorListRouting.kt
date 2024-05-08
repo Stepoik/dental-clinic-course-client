@@ -1,10 +1,10 @@
-package ru.mirea.dentalclinic.presentation.doctorlist.view
+package ru.mirea.dentalclinic.presentation.doctorsearch.view
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import ru.mirea.dentalclinic.di.features.DoctorListComponent
-import ru.mirea.dentalclinic.presentation.doctorlist.DoctorListPresenterImpl
+import ru.mirea.dentalclinic.presentation.doctorsearch.DoctorListPresenterImpl
 import ru.mirea.dentalclinic.utils.ComponentViewModel
 import ru.mirea.dentalclinic.utils.appComponent
 import ru.mirea.dentalclinic.utils.daggerViewModel
@@ -21,7 +21,7 @@ fun NavGraphBuilder.doctorList(navController: NavController) {
             componentViewModel.component.doctorListViewModel()
         }
         val presenter = DoctorListPresenterImpl(viewModel = viewModel, navController = navController)
-        DoctorListScreen(doctorListPresenter = presenter)
+        DoctorListScreen(presenter = presenter)
     }
 }
 

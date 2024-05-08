@@ -3,15 +3,16 @@ package ru.mirea.dentalclinic.presentation.homescreen
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.presentation.appointment.view.navigateToAppointmentScreen
-import ru.mirea.dentalclinic.presentation.authentication.AUTHENTICATION_ROUTE
-import ru.mirea.dentalclinic.presentation.authentication.login.LOGIN_ROUTE
-import ru.mirea.dentalclinic.presentation.doctorlist.view.navigateToDoctorList
+import ru.mirea.dentalclinic.presentation.authentication.navigateToAuthentication
+import ru.mirea.dentalclinic.presentation.doctorsearch.view.navigateToDoctorList
 import ru.mirea.dentalclinic.presentation.doctorpage.view.navigateToDoctorPage
+import ru.mirea.dentalclinic.presentation.proceduredoctors.navigateToProcedureDoctors
+import ru.mirea.dentalclinic.presentation.procedures.navigateToProcedures
 
 class HomeScreenPresenterImpl(
     private val viewModel: HomeViewModel,
     private val navController: NavController
-): HomeScreenPresenter {
+) : HomeScreenPresenter {
     override val state: StateFlow<HomeScreenState> = viewModel.state
 
     override fun update() {
@@ -27,11 +28,7 @@ class HomeScreenPresenterImpl(
     }
 
     override fun navigateToAuth() {
-        navController.navigate(AUTHENTICATION_ROUTE) {
-            popUpTo(navController.currentDestination?.route ?: "") {
-                inclusive = true
-            }
-        }
+        navController.navigateToAuthentication()
     }
 
     override fun navigateToDoctorList() {
@@ -46,4 +43,11 @@ class HomeScreenPresenterImpl(
         navController.navigateToAppointmentScreen(doctorId)
     }
 
+    override fun navigateToProcedures() {
+        navController.navigateToProcedures()
+    }
+
+    override fun navigateToProcedureDoctors(procedureName: String) {
+        navController.navigateToProcedureDoctors(procedureName)
+    }
 }

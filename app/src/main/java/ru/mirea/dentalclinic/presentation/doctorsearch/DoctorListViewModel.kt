@@ -1,4 +1,4 @@
-package ru.mirea.dentalclinic.presentation.doctorlist
+package ru.mirea.dentalclinic.presentation.doctorsearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -20,4 +20,9 @@ interface DoctorService {
     suspend fun getDoctorById(
         @Path("id") id: Long
     ): DoctorDto
+
+    @GET("doctors/procedure/{procedure}")
+    suspend fun getDoctorsByProcedureId(
+        @Path("procedure") procedureName: String
+    ): DoctorsResponse
 }

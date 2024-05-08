@@ -8,5 +8,5 @@ interface AuthRemoteRepository {
 
     suspend fun logout()
 
-    suspend fun register(username: String, password: String): Result<Unit>
+    suspend fun register(username: String, password: String, email: String, firstName: String, lastName: String): Result<Unit>
 }

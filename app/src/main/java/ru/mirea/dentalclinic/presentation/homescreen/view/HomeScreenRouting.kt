@@ -26,5 +26,9 @@ fun NavGraphBuilder.homeScreen(navController: NavController) {
 }
 
 fun NavController.navigateToHome() {
-    navigate(HOME_SCREEN_ROUTE)
+    navigate(HOME_SCREEN_ROUTE) {
+        popUpTo(currentDestination?.route ?: "") {
+            inclusive = true
+        }
+    }
 }

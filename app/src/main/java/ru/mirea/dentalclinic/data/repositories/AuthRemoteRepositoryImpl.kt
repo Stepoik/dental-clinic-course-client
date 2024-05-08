@@ -1,19 +1,8 @@
 package ru.mirea.dentalclinic.data.repositories
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import ru.mirea.dentalclinic.data.models.RegistrationRequest
 import ru.mirea.dentalclinic.data.models.UserDetailsRequest
 import ru.mirea.dentalclinic.data.services.AuthService
-import ru.mirea.dentalclinic.data.utils.AuthScheme
 import ru.mirea.dentalclinic.domain.repositories.AuthLocalRepository
 import ru.mirea.dentalclinic.domain.repositories.AuthRemoteRepository
 import javax.inject.Inject
@@ -39,15 +28,25 @@ class AuthRemoteRepositoryImpl @Inject constructor(
         authLocalRepository.logout()
     }
 
-    override suspend fun register(username: String, password: String): Result<Unit> {
+    override suspend fun register(
+        username: String,
+        password: String,
+        email: String,
+        firstName: String,
+        lastName: String
+    ): Result<Unit> {
         return runCatching {
             val authToken = authService.register(
-                UserDetailsRequest(
+                RegistrationRequest(
                     username = username,
-                    password = password
+                    password = password,
+                    email = email,
+                    firstName = firstName,
+                    lastName = lastName
                 )
             )
             authLocalRepository.login(authToken.token)
         }
     }
+
 }

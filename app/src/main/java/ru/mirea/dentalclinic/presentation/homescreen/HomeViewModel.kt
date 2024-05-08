@@ -2,25 +2,20 @@ package ru.mirea.dentalclinic.presentation.homescreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.mirea.dentalclinic.domain.repositories.AuthLocalRepository
-import ru.mirea.dentalclinic.domain.usecases.GetBestDoctorsUseCase
 import ru.mirea.dentalclinic.domain.usecases.GetHomeInfoUseCase
-import ru.mirea.dentalclinic.domain.usecases.GetPatientInfoUseCase
-import ru.mirea.dentalclinic.domain.usecases.GetProceduresUseCase
-import ru.mirea.dentalclinic.presentation.appointment.models.AppointmentVO
 import ru.mirea.dentalclinic.presentation.common.formatters.DoctorFormatter
 import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
 import ru.mirea.dentalclinic.presentation.homescreen.formatters.HomeAppointmentFormatter
 import ru.mirea.dentalclinic.presentation.homescreen.formatters.PatientFormatter
-import ru.mirea.dentalclinic.presentation.homescreen.formatters.ProcedureFormatter
+import ru.mirea.dentalclinic.presentation.common.models.ProcedureFormatter
 import ru.mirea.dentalclinic.presentation.homescreen.models.HomeAppointmentVO
 import ru.mirea.dentalclinic.presentation.homescreen.models.PatientVO
-import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
+import ru.mirea.dentalclinic.presentation.common.models.ProcedureVO
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(
@@ -35,10 +30,6 @@ class HomeViewModel @Inject constructor(
 
     val state: StateFlow<HomeScreenState>
         get() = _state
-
-    init {
-        update()
-    }
 
     fun onErrorShowed() {
         _state.update { it.copy(error = null) }

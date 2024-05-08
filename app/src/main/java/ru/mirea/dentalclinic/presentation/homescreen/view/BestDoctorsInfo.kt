@@ -61,7 +61,11 @@ fun BestDoctorsInfo(
         CarouselHeader(title = stringResource(id = R.string.best_doctors), onShowAllClicked = {
             presenter.navigateToDoctorList()
         })
-        DoctorCarousel(modifier = Modifier.padding(top = 28.dp).fillMaxSize(), state, presenter)
+        DoctorCarousel(
+            modifier = Modifier.padding(top = 28.dp).fillMaxSize(),
+            state = state,
+            presenter = presenter
+        )
     }
 }
 
@@ -86,8 +90,8 @@ fun DoctorCarousel(
             DoctorCard(
                 doctor,
                 modifier = Modifier
-                    .padding(end = 16.dp)
-                    .clickable(onClick = { presenter.navigateToDoctorPage(doctor.id) })
+                    .padding(end = 16.dp),
+                onItemClick = { presenter.navigateToDoctorPage(doctor.id) }
             )
         }
     }
@@ -95,13 +99,14 @@ fun DoctorCarousel(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DoctorCard(doctor: DoctorVO, modifier: Modifier = Modifier) {
+fun DoctorCard(doctor: DoctorVO, modifier: Modifier = Modifier, onItemClick: (Long) -> Unit = {}) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val cardWidth = (screenWidth * 0.7).dp
     Card(
         modifier = modifier.defaultMinSize(minWidth = cardWidth),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp),
+        onClick = { onItemClick(doctor.id) }
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
@@ -176,6 +181,12 @@ fun BestDoctorsInfoPreview() {
         )
     )
     DentalClinicTheme {
-        BestDoctorsInfo(modifier = Modifier.background(Color.White).fillMaxWidth(), defaultPresenter(state), state)
+        BestDoctorsInfo(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth(),
+            defaultPresenter(state),
+            state
+        )
     }
 }

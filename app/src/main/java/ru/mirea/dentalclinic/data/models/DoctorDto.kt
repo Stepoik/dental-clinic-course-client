@@ -14,7 +14,7 @@ data class DoctorDto(
     @SerializedName("image")
     val image: String?,
     @SerializedName("specialization")
-    val specialization: String?,
+    val specialization: DoctorSpecializationDto?,
     @SerializedName("rate")
     val rate: Float?,
     @SerializedName("experience")

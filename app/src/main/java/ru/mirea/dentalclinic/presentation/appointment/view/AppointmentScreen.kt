@@ -1,6 +1,8 @@
 package ru.mirea.dentalclinic.presentation.appointment.view
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,6 +77,7 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(scaffoldPadding)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             Column(
                 Modifier
@@ -100,7 +104,7 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
                     }
 
                     is AppointmentScreenState.Error -> {
-                        Text(state.error.message ?: "")
+                        LoadingError(modifier = Modifier.fillMaxSize())
                     }
 
                     is AppointmentScreenState.Idle -> {
@@ -110,7 +114,9 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
             }
             AnimatedVisibility(
                 visible = showError,
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
                 Text(
                     text = state.errorMessage ?: "",
@@ -128,9 +134,16 @@ fun AppointmentScreen(presenter: AppointmentPresenter) {
 }
 
 @Composable
+fun LoadingError(modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Text(text = "Ошибка загрузки", fontSize = 30.sp, color = Blue40)
+    }
+}
+
+@Composable
 fun EmptyAppointmentList(modifier: Modifier = Modifier) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.empty_appointment_list), fontSize = 30.sp, color = Blue40)
+        Text(text = stringResource(id = R.string.empty_appointment_list), fontSize = 30.sp, color = Blue40, textAlign = TextAlign.Center)
     }
 }
 

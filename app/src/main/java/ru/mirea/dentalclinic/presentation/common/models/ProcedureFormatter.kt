@@ -1,9 +1,8 @@
-package ru.mirea.dentalclinic.presentation.homescreen.formatters
+package ru.mirea.dentalclinic.presentation.common.models
 
 import android.content.Context
 import ru.mirea.dentalclinic.R
 import ru.mirea.dentalclinic.domain.models.ProcedureCount
-import ru.mirea.dentalclinic.presentation.homescreen.models.ProcedureVO
 import javax.inject.Inject
 
 class ProcedureFormatter @Inject constructor(

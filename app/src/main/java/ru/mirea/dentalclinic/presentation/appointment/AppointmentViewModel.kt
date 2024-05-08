@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ru.mirea.dentalclinic.domain.models.Appointment
 import ru.mirea.dentalclinic.domain.models.Doctor
@@ -51,7 +52,7 @@ class AppointmentViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val appointmentResult = bookAppointmentUseCase.execute(appointmentId)
             appointmentResult.onFailure { _ ->
-                _state.update { it.copy(errorMessage = "Не удалось забронировать") }
+                _state.update { it.copy(errorMessage = "Не удалось записаться") }
             }.onSuccess { loadAppointment() }
         }
     }
@@ -86,11 +87,13 @@ class AppointmentViewModel @AssistedInject constructor(
     }
 
     private fun loadAppointment() {
-        _state.update { it.copy(isLoading = true, error = null) }
         loadingJob?.cancel()
+        _state.update { it.copy(isLoading = true, error = null) }
         loadingJob = viewModelScope.launch {
             val appointmentsResult = getAppointmentsUseCase.execute(_state.value.selectedDate, doctorId)
-            handleAppointmentResult(appointmentsResult)
+            if (isActive) {
+                handleAppointmentResult(appointmentsResult)
+            }
         }
     }
 

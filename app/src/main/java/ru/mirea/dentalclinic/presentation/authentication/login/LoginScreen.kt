@@ -1,6 +1,9 @@
 package ru.mirea.dentalclinic.presentation.authentication.login
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -83,6 +86,14 @@ fun LoginScreen(presenter: LoginScreenPresenter) {
                     modifier = Modifier.padding(top = 20.dp)
                 )
                 Text(
+                    text = stringResource(id = R.string.sign_up),
+                    color = Blue80,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable(onClick = presenter::navigateToRegistration).padding(10.dp)
+                )
+                Text(
                     text = stringResource(id = R.string.sign_in),
                     color = White,
                     modifier = Modifier
@@ -100,7 +111,9 @@ fun LoginScreen(presenter: LoginScreenPresenter) {
             }
             AnimatedVisibility(
                 visible = isError,
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
                 Text(text = stringResource(id = R.string.auth_error))
             }

@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -15,11 +14,11 @@ import androidx.navigation.compose.rememberNavController
 import ru.mirea.dentalclinic.di.features.MainActivityComponent
 import ru.mirea.dentalclinic.presentation.appointment.view.appointmentScreen
 import ru.mirea.dentalclinic.presentation.authentication.authentication
-import ru.mirea.dentalclinic.presentation.authentication.navigateToAuthentication
-import ru.mirea.dentalclinic.presentation.doctorlist.view.doctorList
+import ru.mirea.dentalclinic.presentation.doctorsearch.view.doctorList
 import ru.mirea.dentalclinic.presentation.doctorpage.view.doctorPage
-import ru.mirea.dentalclinic.presentation.homescreen.view.HOME_SCREEN_ROUTE
 import ru.mirea.dentalclinic.presentation.homescreen.view.homeScreen
+import ru.mirea.dentalclinic.presentation.proceduredoctors.procedureDoctors
+import ru.mirea.dentalclinic.presentation.procedures.procedures
 import ru.mirea.dentalclinic.presentation.splash.view.SPLASH_SCREEN_ROUTE
 import ru.mirea.dentalclinic.presentation.splash.view.splash
 import ru.mirea.dentalclinic.ui.theme.DentalClinicTheme
@@ -51,6 +50,8 @@ class MainActivity : ComponentActivity() {
                         appointmentScreen(navController)
                         authentication(navController)
                         splash(navController)
+                        procedureDoctors(navController)
+                        procedures(navController)
                     }
                 }
             }

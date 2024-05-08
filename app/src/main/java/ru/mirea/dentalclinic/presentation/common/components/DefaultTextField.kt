@@ -16,6 +16,7 @@ fun DefaultTextField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    singleLine: Boolean = true
 ) {
     OutlinedTextField(
         value = value,
@@ -24,6 +25,7 @@ fun DefaultTextField(
         label = label,
         placeholder = placeholder,
         shape = RoundedCornerShape(16.dp),
+        singleLine = singleLine,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Blue40,
             unfocusedBorderColor = Blue40,

@@ -1,4 +1,4 @@
-package ru.mirea.dentalclinic.presentation.doctorlist.view
+package ru.mirea.dentalclinic.presentation.doctorsearch.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,15 +17,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,16 +43,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.mirea.dentalclinic.R
 import ru.mirea.dentalclinic.presentation.common.components.DefaultTextField
+import ru.mirea.dentalclinic.presentation.common.components.DoctorList
 import ru.mirea.dentalclinic.presentation.common.models.DoctorVO
 import ru.mirea.dentalclinic.presentation.common.components.Loading
-import ru.mirea.dentalclinic.presentation.doctorlist.DoctorListPresenter
-import ru.mirea.dentalclinic.presentation.doctorlist.DoctorListState
-import ru.mirea.dentalclinic.ui.theme.Blue40
+import ru.mirea.dentalclinic.presentation.doctorsearch.DoctorListPresenter
+import ru.mirea.dentalclinic.presentation.doctorsearch.DoctorListState
 import ru.mirea.dentalclinic.ui.theme.DentalClinicTheme
 
 @Composable
-fun DoctorListScreen(doctorListPresenter: DoctorListPresenter) {
-    val state = doctorListPresenter.state.collectAsState().value
+fun DoctorListScreen(presenter: DoctorListPresenter) {
+    val state = presenter.state.collectAsState().value
     var query by remember {
         mutableStateOf("")
     }
@@ -75,7 +71,7 @@ fun DoctorListScreen(doctorListPresenter: DoctorListPresenter) {
                 value = query,
                 onValueChange = {
                     query = it
-                    doctorListPresenter.onQueryChanged(query)
+                    presenter.onQueryChanged(query)
                 }
             )
             when (state) {
@@ -85,7 +81,7 @@ fun DoctorListScreen(doctorListPresenter: DoctorListPresenter) {
                         modifier = Modifier
                             .padding(top = 20.dp)
                             .weight(1f),
-                        presenter = doctorListPresenter
+                        onItemClick = { doctorId -> presenter.navigateToDoctorPage(doctorId) }
                     )
                 }
 
@@ -99,80 +95,6 @@ fun DoctorListScreen(doctorListPresenter: DoctorListPresenter) {
 
                 else -> {
 
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DoctorList(
-    modifier: Modifier = Modifier,
-    doctors: List<DoctorVO>,
-    presenter: DoctorListPresenter
-) {
-    LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        item {
-            Spacer(modifier = Modifier)
-        }
-        items(doctors) { doctor ->
-            DoctorItem(
-                doctor = doctor,
-                modifier = Modifier.clickable { presenter.navigateToDoctorPage(doctor.id) })
-        }
-    }
-}
-
-@Composable
-fun DoctorItem(modifier: Modifier = Modifier, doctor: DoctorVO) {
-    Card(
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 20.dp),
-        modifier = modifier.padding(horizontal = 10.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .height(IntrinsicSize.Max)
-                .padding(vertical = 10.dp)
-        ) {
-            AsyncImage(
-                model = doctor.image,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .width(50.dp)
-                    .height(50.dp)
-                    .clip(CircleShape)
-            )
-            Column(
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = doctor.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = doctor.specialization)
-            }
-            Column(
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row {
-                    Icon(
-                        imageVector = Icons.Filled.Star, contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(text = doctor.rate)
-                }
-                Row {
-                    Icon(
-                        painter = painterResource(id = R.drawable.backpack),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(text = doctor.experience)
                 }
             }
         }

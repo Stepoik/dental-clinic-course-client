@@ -2,8 +2,7 @@ package ru.mirea.dentalclinic.presentation.splash
 
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.StateFlow
-import ru.mirea.dentalclinic.presentation.authentication.AUTHENTICATION_ROUTE
-import ru.mirea.dentalclinic.presentation.homescreen.view.HOME_SCREEN_ROUTE
+import ru.mirea.dentalclinic.presentation.authentication.navigateToAuthentication
 import ru.mirea.dentalclinic.presentation.homescreen.view.navigateToHome
 
 class SplashScreenPresenterImpl(
@@ -14,18 +13,10 @@ class SplashScreenPresenterImpl(
         get() = viewModel.state
 
     override fun navigateToHome() {
-        navController.navigate(HOME_SCREEN_ROUTE) {
-            popUpTo(navController.currentDestination?.route ?: "") {
-                inclusive = true
-            }
-        }
+        navController.navigateToHome()
     }
 
     override fun navigateToAuth() {
-        navController.navigate(AUTHENTICATION_ROUTE) {
-            popUpTo(navController.currentDestination?.route ?: "") {
-                inclusive = true
-            }
-        }
+        navController.navigateToAuthentication()
     }
 }

@@ -17,4 +17,8 @@ interface HomeScreenPresenter {
     fun navigateToDoctorPage(doctorId: Long)
 
     fun navigateToAppointment(doctorId: Long)
+
+    fun navigateToProcedures()
+
+    fun navigateToProcedureDoctors(procedureName: String)
 }

@@ -39,4 +39,11 @@ class DoctorRepositoryImpl @Inject constructor(
             doctorMapper.mapToDoctor(response)
         }
     }
+
+    override suspend fun getDoctorsByProcedure(procedureName: String): Result<List<Doctor>> {
+        return runCatching {
+            val response = doctorService.getDoctorsByProcedureId(procedureName)
+            response.doctors.map(doctorMapper::mapToDoctor)
+        }
+    }
 }

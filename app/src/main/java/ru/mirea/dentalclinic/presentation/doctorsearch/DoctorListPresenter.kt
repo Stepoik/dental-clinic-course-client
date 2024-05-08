@@ -1,7 +1,6 @@
-package ru.mirea.dentalclinic.presentation.doctorlist
+package ru.mirea.dentalclinic.presentation.doctorsearch
 
 import kotlinx.coroutines.flow.StateFlow
-import retrofit2.http.Query
 
 interface DoctorListPresenter {
     val state: StateFlow<DoctorListState>

@@ -13,6 +13,9 @@
     <string name="sign_up">Зарегистрироваться</string>
     <string name="password">Пароль</string>
     <string name="username">Логин</string>
+    <string name="email">Почта</string>
+    <string name="firstName">Имя</string>
+    <string name="lastName">Фамилия</string>
     <string name="empty_appointment_list">На этот день нет записей</string>
     <string name="auth_error">Неверные данные</string>
     <plurals name="doctor">

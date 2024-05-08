@@ -10,6 +10,8 @@ import ru.mirea.dentalclinic.di.features.DaggerDoctorPageComponent
 import ru.mirea.dentalclinic.di.features.DaggerHomeScreenComponent
 import ru.mirea.dentalclinic.di.features.DaggerLoginScreenComponent
 import ru.mirea.dentalclinic.di.features.DaggerMainActivityComponent
+import ru.mirea.dentalclinic.di.features.DaggerProcedureDoctorsComponent
+import ru.mirea.dentalclinic.di.features.DaggerProceduresComponent
 import ru.mirea.dentalclinic.di.features.DaggerRegistrationScreenComponent
 import ru.mirea.dentalclinic.di.features.DaggerSplashScreenComponent
 import ru.mirea.dentalclinic.di.features.DoctorListComponent
@@ -17,6 +19,8 @@ import ru.mirea.dentalclinic.di.features.DoctorPageComponent
 import ru.mirea.dentalclinic.di.features.HomeScreenComponent
 import ru.mirea.dentalclinic.di.features.LoginScreenComponent
 import ru.mirea.dentalclinic.di.features.MainActivityComponent
+import ru.mirea.dentalclinic.di.features.ProcedureDoctorsComponent
+import ru.mirea.dentalclinic.di.features.ProceduresComponent
 import ru.mirea.dentalclinic.di.features.RegistrationScreenComponent
 import ru.mirea.dentalclinic.di.features.SplashScreenComponent
 
@@ -61,6 +65,16 @@ interface ComponentsModule {
         @Provides
         fun provideRegistrationScreenComponent(appComponent: AppComponent): RegistrationScreenComponent {
             return DaggerRegistrationScreenComponent.factory().create(appComponent)
+        }
+
+        @Provides
+        fun provideProceduresComponent(appComponent: AppComponent): ProceduresComponent {
+            return DaggerProceduresComponent.factory().create(appComponent)
+        }
+
+        @Provides
+        fun provideProcedureDoctorsComponent(appComponent: AppComponent): ProcedureDoctorsComponent {
+            return DaggerProcedureDoctorsComponent.factory().create(appComponent)
         }
     }
 }
